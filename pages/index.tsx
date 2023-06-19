@@ -7,22 +7,26 @@ interface IProps {
 	videos: Video[];
 }
 const Home = ({ videos }: IProps) => {
-	// console.log(videos);
 	return (
 		<div className='flex-flex-col gap-10 videosh-full'>
 			{videos.length ? (
-				videos.map((video: Video) => <VideoCard key={video._id} post={video} />)
+				videos?.map((video: Video) => <VideoCard key={video._id} post={video} />)
 			) : (
-				<NoResult text={'No Video'} />
+				<NoResult text={'No Videos'} />
 			)}
 		</div>
 	);
 };
-export const getServerSideProps = async () => {
-	const { data } = await axios.get(`${BASE_URL}/api/post`);
+export const getServerSideProps = async ({ query: { topic } }: { query: { topic: string } }) => {
+	let res = null;
+	if (topic) {
+		res = await axios.get(`${BASE_URL}/api/discover/${topic}`);
+	} else {
+		res = await axios.get(`${BASE_URL}/api/post`);
+	}
 	return {
 		props: {
-			videos: data,
+			videos: res.data,
 		},
 	};
 };
